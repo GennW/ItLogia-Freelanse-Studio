@@ -15,6 +15,7 @@ export class Router {
                 route: '/',
                 title: 'Дашборд',
                 filePathTemplate: '/templates/dashboard.html',
+                uselayout: '/templates/layout.html',
                 load: () => {
                     new Dashboard();
                 }
@@ -22,12 +23,14 @@ export class Router {
             {
                 route: '/404',
                 title: 'Страница не найдена',
-                filePathTemplate: '/templates/404.html'
+                filePathTemplate: '/templates/404.html',
+                uselayout: false,
             },
             {
                 route: '/login',
                 title: 'Авторизация',
                 filePathTemplate: '/templates/login.html',
+                uselayout: false,
                 load: () => {
                     new Login();
                 }
@@ -36,6 +39,7 @@ export class Router {
                 route: '/sign-up',
                 title: 'Регистрация',
                 filePathTemplate: '/templates/sign-up.html',
+                uselayout: false,
                 load: () => {
                     new SignUp();
                 }
@@ -58,9 +62,29 @@ export class Router {
             }
 
             if (newRoute.filePathTemplate) {
-                this.contentPageElement.innerHTML = await fetch(newRoute.filePathTemplate)
-                    .then(response => response.text())
+                // 1:41:50 блок ниже можно переписать оптимизация
+                let contentBlock = this.contentPageElement;
+                if (newRoute.uselayout) {
+                    // Если установлен флаг newRoute.uselayout, загружаем содержимое страницы из указанного макета
+                    this.contentPageElement.innerHTML = await fetch(newRoute.uselayout)
+                        .then(response => response.text());
+                    contentBlock = document.getElementById('content-layout');
+
+                    // для переключения стилей при сворачивании сайдбара
+                    document.body.classList.add('sidebar-mini');
+                    document.body.classList.add('layout-fixed');
+                } else {
+                    // для переключения стилей при сворачивании сайдбара
+                    document.body.classList.remove('sidebar-mini');
+                    document.body.classList.remove('layout-fixed');
+                }
+                // Загружаем содержимое страницы из указанного шаблона файла пути
+                contentBlock.innerHTML = await fetch(newRoute.filePathTemplate)
+                    .then(response => response.text());
             }
+
+
+
 
             if (newRoute.load && typeof newRoute.load === 'function') {
                 newRoute.load();
