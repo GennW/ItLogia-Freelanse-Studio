@@ -63,6 +63,12 @@ export class Router {
                 },
                 styles: ['icheck-bootstrap.min.css'],
             },
+            {
+                route: '/logout',
+                load: () => {
+
+                }
+            },
         ]
     }
 
